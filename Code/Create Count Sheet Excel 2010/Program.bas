@@ -4,7 +4,7 @@ Option Explicit
 Sub CountSheet()
     Dim i As Long
     Dim x As Long
-    Dim sPath As String
+    Dim Path As String
     Dim vArray As Variant
     Dim vSplit() As Variant
     Dim sBranch As String
@@ -15,14 +15,14 @@ Sub CountSheet()
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
 
-    sPath = Application.GetOpenFilename("All Files (*.*), *.*")
-
-    If sPath = "False" Then
+    'Import inventory count sheet
+    Path = Application.GetOpenFilename("All Files (*.*), *.*", Title:="Open Inventory Count Sheet (stdin.txt)")
+    If Path = "False" Then
         Application.ScreenUpdating = True
         Application.DisplayAlerts = True
         Exit Sub
     Else
-        Workbooks.Open sPath
+        Workbooks.Open Path
     End If
 
     If Range("A1").Text <> " " Then
