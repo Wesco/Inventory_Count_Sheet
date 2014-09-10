@@ -15,9 +15,11 @@ Sub CountSheet()
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
 
-    sPath = Application.GetOpenFilename("stdin (*.txt), *.txt")
+    sPath = Application.GetOpenFilename("All Files (*.*), *.*")
 
     If sPath = "False" Then
+        Application.ScreenUpdating = True
+        Application.DisplayAlerts = True
         Exit Sub
     Else
         Workbooks.Open sPath
