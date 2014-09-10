@@ -260,14 +260,27 @@ Sub ReStructure()
 End Sub
 
 Sub CleanUp()
-    ThisWorkbook.Worksheets("Raw").Cells.Delete
-    ThisWorkbook.Worksheets("Temp").Cells.Delete
-    ThisWorkbook.Worksheets("Count Sheet").Cells.Delete
-    ThisWorkbook.Save
+    Dim s As Worksheet
+    Dim PrevDispAlert As Boolean
+    Dim PrevScrnUpdat As Boolean
+
+    PrevDispAlert = Application.DisplayAlerts
+    PrevScrnUpdat = Application.ScreenUpdating
+    Application.DisplayAlerts = False
+    Application.ScreenUpdating = False
+
+    ThisWorkbook.Activate
+
+    For Each s In ThisWorkbook.Sheets
+        If s.Name <> "Macro" Then
+            s.Select
+            s.Cells.Delete
+        End If
+    Next
+
+    Application.DisplayAlerts = PrevDispAlert
+    Application.ScreenUpdating = PrevScrnUpdat
+
+    Sheets("Macro").Select
+    Range("C7").Select
 End Sub
-
-
-
-
-
-
