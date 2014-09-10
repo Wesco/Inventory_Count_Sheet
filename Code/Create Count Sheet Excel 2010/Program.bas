@@ -11,11 +11,12 @@ Sub CountSheet()
     Dim sReportDate As String
     Dim sBrNumber As String
     Dim sTest As Variant
+    Dim TotalRows As Long
 
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
 
-    'Import inventory count sheet
+    'Open inventory count sheet
     Path = Application.GetOpenFilename("All Files (*.*), *.*", Title:="Open Inventory Count Sheet (stdin.txt)")
     If Path = "False" Then
         Application.ScreenUpdating = True
@@ -25,13 +26,17 @@ Sub CountSheet()
         Workbooks.Open Path
     End If
 
+    'Check to first cell to see if it contains a special character
+    'that identifies the sheet as the inventory file
     If Range("A1").Text <> " " Then
         MsgBox "File validation failed." & vbCrLf & "Please make sure you selected the correct inventory file."
         ActiveWorkbook.Close
         Exit Sub
     End If
 
-    Range(Cells(1, 1), Cells(ActiveSheet.UsedRange.Rows.Count, 1)).Copy Destination:=ThisWorkbook.Worksheets("Raw").Range("A1")
+    'Import inventory count sheet
+    TotalRows = ActiveSheet.UsedRange.Rows.Count
+    Range("A1:A" & TotalRows).Copy Destination:=ThisWorkbook.Sheets("Raw").Range("A1")
 
     ActiveWorkbook.Close
     Worksheets("Raw").Select
