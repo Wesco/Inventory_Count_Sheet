@@ -7,10 +7,10 @@ Sub CountSheet()
     Dim Path As String
     Dim vArray As Variant
     Dim vSplit() As Variant
-    Dim sBranch As String
-    Dim sReportDate As String
-    Dim sBrNumber As String
-    Dim sTest As Variant
+    Dim Branch As String
+    Dim ReportDate As String
+    Dim BrNumber As String
+    Dim Test As Variant
     Dim TotalRows As Long
 
     Application.ScreenUpdating = False
@@ -37,30 +37,27 @@ Sub CountSheet()
     'Import inventory count sheet
     TotalRows = ActiveSheet.UsedRange.Rows.Count
     Range("A1:A" & TotalRows).Copy Destination:=ThisWorkbook.Sheets("Raw").Range("A1")
-
     ActiveWorkbook.Close
-    Worksheets("Raw").Select
 
-    Worksheets("Temp").Range("A1").Value = Cells(5, 1).Text
-    Worksheets("Temp").Select
-    Range("A1").Select
-    Selection.TextToColumns Destination:=Range("A1"), _
+    Sheets("Temp").Select
+    Range("A1").Value = Sheets("Raw").Range("A5").Text
+    Range("A1").TextToColumns Destination:=Range("A1"), _
                             DataType:=xlFixedWidth, _
                             FieldInfo:=Array(Array(0, 1), Array(4, 1), Array(51, 1), Array(122, 1), Array(130, 1)), _
                             TrailingMinusNumbers:=True
 
-    sReportDate = Range("B1").Text
-    sBranch = Range("C1").Text
+    ReportDate = Range("B1").Text
+    Branch = Range("C1").Text
     ActiveSheet.UsedRange.Delete
 
 
-    sBrNumber = InputBox("Enter your branch number.", "Enter Branch #")
+    BrNumber = InputBox("Enter your branch number.", "Enter Branch #")
 
-    If sBrNumber = "" Then
-        sBrNumber = "0000"
+    If BrNumber = "" Then
+        BrNumber = "0000"
     End If
 
-    Worksheets("Raw").Select
+    Sheets("Raw").Select
     vArray = ActiveSheet.UsedRange.Rows
 
     For i = 1 To UBound(vArray)
@@ -82,7 +79,7 @@ Sub CountSheet()
         If InStr(CStr(vArray(i, 1)), "COUNTED BY") Then
             vArray(i, 1) = ""
         End If
-        If InStr(CStr(vArray(i, 1)), sBranch) Then
+        If InStr(CStr(vArray(i, 1)), Branch) Then
             vArray(i, 1) = ""
         End If
         If InStr(CStr(vArray(i, 1)), "END OF REPORT") Then
@@ -154,8 +151,8 @@ Sub CountSheet()
     ActiveSheet.PageSetup.PrintArea = ""
 
     With ActiveSheet.PageSetup
-        .LeftHeader = "&15&B " & sBrNumber & "  " & sBranch & "  &B"
-        .CenterHeader = "&15&B" & sReportDate & " Physcial Inventory    &B"
+        .LeftHeader = "&15&B " & BrNumber & "  " & Branch & "  &B"
+        .CenterHeader = "&15&B" & ReportDate & " Physcial Inventory    &B"
         .RightHeader = _
         "&15&BCounted By:&B _____________________________ " & Chr(10) & "" & Chr(10) & "&BRechecked By:&B ___________________________ "
         .LeftFooter = ""
@@ -188,9 +185,9 @@ Sub CountSheet()
     Application.DisplayAlerts = True
     Worksheets("Count Sheet").Copy
     On Error GoTo SAVE_FAILED
-    ActiveWorkbook.SaveAs ThisWorkbook.Path & "\" & sBrNumber & " Count Sheet " & Format(Date, "mm-dd-yy"), FileFormat:=xlNormal
+    ActiveWorkbook.SaveAs ThisWorkbook.Path & "\" & BrNumber & " Count Sheet " & Format(Date, "mm-dd-yy"), FileFormat:=xlNormal
     On Error GoTo 0
-    MsgBox "Saved to: " & vbCrLf & ThisWorkbook.Path & "\" & sBrNumber & " Count Sheet " & Format(Date, "mm-dd-yy") & ".xls"
+    MsgBox "Saved to: " & vbCrLf & ThisWorkbook.Path & "\" & BrNumber & " Count Sheet " & Format(Date, "mm-dd-yy") & ".xls"
     Application.DisplayAlerts = False
     CleanUp
     Application.ScreenUpdating = True
