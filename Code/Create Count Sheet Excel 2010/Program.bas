@@ -39,20 +39,18 @@ Sub CountSheet()
     Range("A1:A" & TotalRows).Copy Destination:=ThisWorkbook.Sheets("Raw").Range("A1")
     ActiveWorkbook.Close
 
+    'Process the report header to get the date and branch
     Sheets("Temp").Select
     Range("A1").Value = Sheets("Raw").Range("A5").Text
     Range("A1").TextToColumns Destination:=Range("A1"), _
-                            DataType:=xlFixedWidth, _
-                            FieldInfo:=Array(Array(0, 1), Array(4, 1), Array(51, 1), Array(122, 1), Array(130, 1)), _
-                            TrailingMinusNumbers:=True
-
+                              DataType:=xlFixedWidth, _
+                              FieldInfo:=Array(Array(0, 1), Array(4, 1), Array(51, 1), Array(122, 1), Array(130, 1)), _
+                              TrailingMinusNumbers:=True
     ReportDate = Range("B1").Text
     Branch = Range("C1").Text
     ActiveSheet.UsedRange.Delete
 
-
     BrNumber = InputBox("Enter your branch number.", "Enter Branch #")
-
     If BrNumber = "" Then
         BrNumber = "0000"
     End If
@@ -60,84 +58,82 @@ Sub CountSheet()
     Sheets("Raw").Select
     vArray = ActiveSheet.UsedRange.Rows
 
+    'Clear data from the array that is not needed
     For i = 1 To UBound(vArray)
         If InStr(CStr(vArray(i, 1)), "PHYSICAL INVENTORY") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "PAGE") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "PAGE") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "CHECKED BY") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "CHECKED BY") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "SIM NUMBER") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "SIM NUMBER") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "ITEM DESCRIPTION") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "ITEM DESCRIPTION") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "COUNTED BY") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "COUNTED BY") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), Branch) Then
+        ElseIf InStr(CStr(vArray(i, 1)), Branch) Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "END OF REPORT") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "END OF REPORT") Then
             vArray(i, 1) = ""
-        End If
-        If InStr(CStr(vArray(i, 1)), "") Then
+        ElseIf InStr(CStr(vArray(i, 1)), "") Then
             vArray(i, 1) = ""
-        End If
-        If vArray(i, 1) = " " Then
+        ElseIf vArray(i, 1) = " " Then
             vArray(i, 1) = ""
         End If
     Next
 
-    Worksheets("Count Sheet").Select
-    Range(Cells(1, 2), Cells(UBound(vArray), 2)) = vArray
-    Range("A1").Value = "Col1"
-    Range(Cells(2, 1), Cells(UBound(vArray), 1)).Value = "x"
-    Range("B1").Value = "Col2"
-    Range(Cells(1, 1), Cells(UBound(vArray), 2)).AutoFilter Field:=2, Criteria1:="<>"
+    'Fill the count sheet with inventory data
+    Sheets("Count Sheet").Select
+    Range("B1:B" & UBound(vArray)) = vArray
 
-    ActiveSheet.UsedRange.Copy Destination:=Worksheets("Temp").Range("A1")
-    Worksheets("Temp").Columns(1).Delete
-    Worksheets("Temp").Rows(1).Delete
+    'Fill column A so that it can be filtered
+    Range("A1").Value = "Col1"
+    Range("A2:A" & UBound(vArray)).Value = "x"
+
+    'Add a header to column B so it can be filtered
+    Range("B1").Value = "Col2"
+
+    'Remove all blank cells
+    Range("A1:B" & UBound(vArray)).AutoFilter Field:=2, Criteria1:="<>"
+    ActiveSheet.UsedRange.Copy Destination:=Sheets("Temp").Range("A1")
+    Sheets("Temp").Columns(1).Delete
+    Sheets("Temp").Rows(1).Delete
     vArray = Worksheets("Temp").UsedRange
     ActiveSheet.AutoFilterMode = False
     ActiveSheet.Cells.Delete
-    Worksheets("Temp").Cells.Delete
+    Sheets("Temp").Cells.Delete
     Range(Cells(1, 1), Cells(UBound(vArray), 1)) = vArray
 
+    'vArray should always be an even number because
+    'inventory lines are added 2 at a time and all
+    'other data has been removed
     ReDim vSplit(1 To UBound(vArray) / 2, 1 To 2)
-
-    x = 0
     For i = 1 To UBound(vArray)
         If i Mod 2 = 0 Then
+            'Put all even lines in column 1
             vSplit(i / 2, 2) = vArray(i, 1)
         Else
+            'put all odd lines in column 2
             x = (i / 2) + 0.5
             vSplit(x, 1) = vArray(i, 1)
         End If
     Next
 
-    Worksheets("Count Sheet").Cells.Delete
-    Range(Cells(1, 1), Cells(UBound(vSplit), 2)) = vSplit
+    Sheets("Count Sheet").Cells.Delete
+    Range("A1:B" & UBound(vSplit)) = vSplit
 
-    Columns("B:B").Select
-    Selection.TextToColumns Destination:=Range("B1"), DataType:=xlFixedWidth, _
-                            FieldInfo:=Array(Array(0, 1), Array(21, 1), Array(81, 1), Array(90, 1), Array(99, 1), _
-                                             Array(108, 1), Array(117, 1), Array(127, 1)), TrailingMinusNumbers:=True
+    Columns("B:B").TextToColumns Destination:=Range("B1"), _
+                                 DataType:=xlFixedWidth, _
+                                 FieldInfo:=Array(Array(0, 1), Array(21, 1), Array(81, 1), Array(90, 1), Array(99, 1), Array(108, 1), Array(117, 1), Array(127, 1)), _
+                                 TrailingMinusNumbers:=True
 
-    Range("B1").Select
     Range("B:F").EntireColumn.Insert
-    Columns("A:A").Select
-    Selection.TextToColumns Destination:=Range("A1"), _
-                            DataType:=xlFixedWidth, _
-                            FieldInfo:=Array(Array(0, 1), Array(2, 1), Array(17, 1), Array(20, 1), Array(28, 1), Array(39, 1)), _
-                            TrailingMinusNumbers:=True
+    Columns("A:A").TextToColumns Destination:=Range("A1"), _
+                                 DataType:=xlFixedWidth, _
+                                 FieldInfo:=Array(Array(0, 1), Array(2, 1), Array(17, 1), Array(20, 1), Array(28, 1), Array(39, 1)), _
+                                 TrailingMinusNumbers:=True
 
-    Range("A1").Select
     Rows(1).Insert Shift:=xlDown
     Range("A1:N1").Value = Array("LN #", "SIM NUMBER", "UOM", "CON", "WIP", "WIT", "LOCATION", "ITEM DESCRIPTION", "COUNT   #1", "COUNT TOTAL", "RECHECK  #1", "RECHECK  #2", "DELETE", "DELETE")
     'Reorder columns, add page numbers, align text, and set font
@@ -183,12 +179,11 @@ Sub CountSheet()
     End With
 
     Application.DisplayAlerts = True
-    Worksheets("Count Sheet").Copy
+    Sheets("Count Sheet").Copy
     On Error GoTo SAVE_FAILED
     ActiveWorkbook.SaveAs ThisWorkbook.Path & "\" & BrNumber & " Count Sheet " & Format(Date, "mm-dd-yy"), FileFormat:=xlNormal
     On Error GoTo 0
     MsgBox "Saved to: " & vbCrLf & ThisWorkbook.Path & "\" & BrNumber & " Count Sheet " & Format(Date, "mm-dd-yy") & ".xls"
-    Application.DisplayAlerts = False
     CleanUp
     Application.ScreenUpdating = True
     Application.ScreenUpdating = True
