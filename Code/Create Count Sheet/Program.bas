@@ -188,7 +188,7 @@ Sub CountSheet()
     On Error GoTo 0
     MsgBox "Saved to: " & vbCrLf & ThisWorkbook.Path & "\" & BrNumber & " Count Sheet " & Format(Date, "mm-dd-yy") & ".xls"
     CleanUp
-    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
     Application.ScreenUpdating = True
     Exit Sub
 

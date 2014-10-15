@@ -23,4 +23,5 @@ End Sub
 
 Private Sub Workbook_Open()
     Range("G12").Formula = "=HYPERLINK(" & """" & ThisWorkbook.Path & """" & "," & """" & ThisWorkbook.Path & """" & ")"
+    CheckForUpdates RepositoryName, VersionNumber
 End Sub
