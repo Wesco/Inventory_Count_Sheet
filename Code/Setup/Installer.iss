@@ -5,7 +5,7 @@
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Wesco Distribution, Inc."
 #define MyAppURL "http://www.github.com/wesco"
-#define MyAppExeName "Create Count Sheet.xlsm"
+#define MyAppExeName "Count Sheet Macro.xlsm"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
