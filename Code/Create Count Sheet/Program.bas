@@ -1,6 +1,9 @@
 Attribute VB_Name = "Program"
 Option Explicit
 
+Public Const VersionNumber As String = "1.0.0"
+Public Const RepositoryName As String = "Inventory_Count_Sheet"
+
 Sub CountSheet()
     Dim i As Long
     Dim x As Long
